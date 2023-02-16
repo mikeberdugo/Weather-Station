@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  MQTT:
+    container_name: 'rabbit'
+    image: rabbit_image
+    restart: always 
+    ports:
+        - 1883:1883
+        - 5672:5672
+        - 15672:15672
+    build: 
+      context: .
+      dockerfile: rabbit/Dockerfile
+    environment:
+            - "RABBITMQ_DEFAULT_PASS=pass"
+            - "RABBITMQ_DEFAULT_USER=user"
+    networks:
+      default:
+        aliases:
+          - rabbit
+
+
