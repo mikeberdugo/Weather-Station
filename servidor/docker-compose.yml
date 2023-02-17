@@ -1,0 +1,19 @@
+version: "3.2"
+services:
+  broker:
+    container_name: 'rabbit'
+    image: rabbit_image
+    restart: always 
+    ports:
+        - 1883:1883
+        - 5672:5672
+        - 15672:15672
+    build: 
+      context: .
+      dockerfile: rabbitmq/Dockerfile
+
+    networks:
+      default:
+        aliases:
+          - rabbit
+
