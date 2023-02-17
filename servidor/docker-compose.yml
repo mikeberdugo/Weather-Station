@@ -16,4 +16,31 @@ services:
       default:
         aliases:
           - rabbit
+#........................ influx .....................
+  database:
+    container_name: influx
+    image: influx_image
+    restart: always 
+    ports:
+        - 8086:8086
+    build: 
+      context: .
+      dockerfile: influx/Dockerfile
+    env_file:
+      - influx/setup.env
+    networks:
+      default:
+        aliases:
+          - influx
 
+  telegraf:
+      container_name: telegraf
+      image: telegraf-image
+      restart: always
+      build:
+        context: .
+        dockerfile: telegra/Dockerfile
+      volumes:
+        - ./telegra/telegra.conf:/etc/telegraf/telegraf.conf
+      depends_on:
+        - database
