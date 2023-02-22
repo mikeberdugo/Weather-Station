@@ -364,6 +364,9 @@ longword2double
 lts
 lts_bit
 main
+max6675_init
+max6675_pulso
+max6675_read
 mc1out
 mc1out_bit
 mc2out

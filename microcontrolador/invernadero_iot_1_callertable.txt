@@ -1,2 +1,14 @@
 main
 	incio
+	max6675_init
+	max6675_read
+		max6675_pulso
+		word2double
+			NRM3232
+				RES032
+				SETFUN32
+				FIXSIGN32
+		Mul_32x32_FP
+			RES032
+			SETFOV32
+			SETFUN32
