@@ -43,10 +43,11 @@ Count=0
 [Useses]
 Count=0
 [EXPANDED_NODES]
-0=LedBlinking.mcppi
-Count=1
-[LIB_EXPANDED_NODES]
 Count=0
+[LIB_EXPANDED_NODES]
+0=mikroE Libraries
+1=System Libraries
+Count=2
 [PROGRAMMER_TYPE]
 Value=mikroE mikroProg
 [CODEGRIP_OPTIONS]
