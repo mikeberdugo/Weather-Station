@@ -22,7 +22,7 @@ services:
     image: influx_image
     restart: always 
     ports:
-        - 8086:8086
+        - 8086:80
     build: 
       context: .
       dockerfile: influx/Dockerfile
