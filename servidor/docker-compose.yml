@@ -11,7 +11,6 @@ services:
     build: 
       context: .
       dockerfile: rabbitmq/Dockerfile
-
     networks:
       default:
         aliases:
@@ -22,7 +21,7 @@ services:
     image: influx_image
     restart: always 
     ports:
-        - 8086:80
+        - 8086:8086
     build: 
       context: .
       dockerfile: influx/Dockerfile
