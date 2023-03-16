@@ -6,20 +6,19 @@
     "users": [
       {
         "name": "mike",
-        "password_hash": "dfrWOajIM5i4a/f1RhtL6DA1lFPSJ82X4CbdOP3NRQCWLNXt",
-        "hashing_algorithm": "rabbit_password_hashing_sha256",
+        "password": "berdugo13",
         "tags": "administrator"
       }
     ],
     "vhosts": [
       {
-        "name": "demo-vhost"
+        "name": "/"
       }
     ],
     "permissions": [
       {
         "user": "mike",
-        "vhost": "demo-vhost",
+        "vhost": "/",
         "configure": ".*",
         "write": ".*",
         "read": ".*"
@@ -47,7 +46,7 @@
     "queues": [
       {
         "name": "Weather-Station",
-        "vhost": "demo-vhost",
+        "vhost": "/",
         "durable": true,
         "auto_delete": false,
         "arguments": {
@@ -61,7 +60,7 @@
     "bindings": [
       {
         "source": "amq.topic",
-        "vhost": "demo-vhost",
+        "vhost": "/",
         "destination": "Weather-Station",
         "destination_type": "queue",
         "routing_key": "#",

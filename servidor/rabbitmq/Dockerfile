@@ -5,6 +5,7 @@ COPY rabbitmq/definitions.json /etc/rabbitmq
 
 RUN cat /etc/rabbitmq/rabbitmq.conf
 
+
 RUN rabbitmq-plugins enable rabbitmq_mqtt
 RUN rabbitmq-plugins enable rabbitmq_web_mqtt
 

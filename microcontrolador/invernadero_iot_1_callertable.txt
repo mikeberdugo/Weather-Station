@@ -1,2 +1,11 @@
 main
+	__CC2DW
+		____DoICP
 	incio
+		UART1_Init
+		iniciar_moden
+	max6675_init
+	Inicializar_ADC
+	moden_coneccion
+		UART1_Write_Text
+			UART1_Write
