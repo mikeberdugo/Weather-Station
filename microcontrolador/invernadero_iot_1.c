@@ -1,175 +1,119 @@
- //// definiciones de conexiones
- 
- //define conexiones termocuplas
-#define max6675_ck RC3_bit
-#define max6675_dat RC4_bit
+/// definiciones
+#define true 1
 
-#define max6675_ck_dir trisc.b3
-#define max6675_dat_dir   trisc.b4
+/// sensor dth11
+#define  PIN_SENSOR_Direction trisb.b0
+#define PIN_SENSOR RB0_bit
+/// reles
+#define PIN_RELE1  RB1_bit
+#define PIN_RELE2  RB2_bit
+#define PIN_RELE3  RB3_bit
 
-#define max6675_cs  RC0_bit
-#define max6675_cs_dir  trisc.b0
-
-/// definicion variables de control
-//Listado de comando AT disponibles para ser enviados al modem Quectel
-
-/// estrucura
-struct estado_fsm{char anterior, actual;};
+#define PIN_ERROR  RB7_bit
+#define PIN_OK  RB6_bit
 
 
-/// variables global
-struct estado_fsm ec_fsm;
 
 
-const char *ec25_comandos_at[] = {
-        "AT",                        //comprueba disponibilidad de dispositivo
-        "ATI",                        //consulta información del modem
-        "AT+CPIN?",                //consulta estado de la simcard
-        "AT+CREG?",                //consulta estado de la red celular y tecnología usada en red celular
-        "AT+CMGF=1",        //asigna modo texto para enviar mensajes
-        "AT+CMGS=\"3152849863\"",//envia mensaje de texto a numero definido
-        "Mensaje", //MENSAJE & CTRL+Z
-};
 
-//Lista de respuestas a cada comando AT
-const char  *ec25_repuestas_at[]={
-                "OK",                //AT
-                "EC20",                //ATI
-                "READY",        //AT+CPIN?
-                "0,1",                //AT+CREG? = GSM,REGISTERED
-                "OK",                //AT+CMGF=1
-                ">",                //AT+CMGS
-                "OK",                //MENSAJE & CTRL+Z
-};
-
-enum _ec25_lista_comandos_at {
-        kAT = 0,
-        kATI,
-        kAT_CPIN,
-        kAT_CREG,
-        kAT_CMGF_1,
-        kAT_CMGS,
-        kAT_TEXT_MSG_END,
-};
-
-enum _fsm_ec25_state{
-        kFSM_INICIO=0,
-        kFSM_ENVIANDO_AT,
-        kFSM_ENVIANDO_ATI,
-        kFSM_ENVIANDO_CPIN,
-        kFSM_ENVIANDO_CREG,
-        kFSM_ENVIANDO_CMGF,
-        kFSM_ENVIANDO_CMGS,
-        kFSM_ENVIANDO_MENSAJE_TXT,
-        kFSM_ESPERANDO_RESPUESTA,
-        kFSM_RESULTADO_ERROR,
-        kFSM_RESULTADO_EXITOSO
-};
-
-/// funciones moden
-void iniciar_moden();
-void moden_coneccion();
-
-/// funciones sensor de temperatura 1 -- termocupla
-void max6675_init();
-float max6675_read();
-
-///  funciones sensor de humedad 1 -- terrestre
+/// prototipos de funciones
+void incio();
+// sensor humedad 1
 void Inicializar_ADC();
 unsigned int Leer_ADC(unsigned char canal);
+char read_dth11();
 
 
-
-void incio();
-void sensor_1_temperatura();
-
-
-void main() {
-incio();
-//// iniciar modulos ////
-max6675_init();
-
-Inicializar_ADC();
-
-while(1){
-  //max6675_read();
-  //Delay_ms(1000);
-  //Leer_ADC(0);
-  moden_coneccion();
-  Delay_ms(10000);
- }
-}
+char read_uart();
+int temperatura=0;
+int  humedad=0;
 
 
+void main(){
+ /// VARIABLES
+ char lec = 'A';
+ unsigned int aux = 0;
+ int humedad1 ;
+ int temperatura1,humedad2,temperatura2;
+ char entero[7];
+ char flotante[15];
 
-void incio(){
-ANSEL = ANSELH = 0X00 ;
-
-/// PUERTO A
-TRISA = 0X00;
-PORTA = 0X00;
-
-/// PUERTO B
-TRISB = 0X00;
-PORTB = 0X00;
-
-/// PUERTO C
-TRISC = 0X00;
-PORTC = 0X00;
-
-/// PUERTO D
-TRISD = 0X00;
-PORTD = 0X00;
-
-/// PUERTO E
-TRISE = 0X00;
-PORTE = 0X00;
-
-/// serial
+  ANSEL = ANSELH = 0X00 ;
+  /// PUERTO A
+  TRISA = 0X00;
+  PORTA = 0X00;
+  /// PUERTO B
+  TRISB = 0X00;
+  PORTB = 0X08;
+  /// PUERTO C
+  /*TRISC = 0X80;
+  PORTC = 0X00;*/
+  /// PUERTO D
+  TRISD = 0X00;
+  PORTD = 0X00;
+  /// PUERTO E
+  TRISE = 0X00;
+  PORTE = 0X00;
+  /// serial
   UART1_Init(9600);               // Initialize UART module at 9600 bps
   Delay_ms(100);
 
-iniciar_moden();
-}
+while(true){
+ /*UART1_Write_Text("hola 1");
+     UART1_Write('B');
+     PORTA=0XFF;
+     delay_ms(1000);
+     PORTA=0X00;
+     delay_ms(1000);*/
+   if (lec == 'A'){
+      PIN_OK = ~PIN_OK;
+      lec = 'J';
+   }
 
-void max6675_init(){
-   max6675_ck_dir=0;   //salida reloj
-   max6675_cs_dir=0;  //salida cs
-   max6675_dat_dir=1;  //entrada dato
+   lec = read_uart();
    
-   max6675_cs=1;//salida 1
-   max6675_ck=0; //saca cero por el reloj
-   Delay_ms(100);
+   read_dth11() ;
+
+   
+
+    if (lec == 'B'){
+      humedad1 = ADC_Read(0);    /// humedad terrestre
+      IntToStr(humedad1,entero);
+      UART1_Write_Text(entero);
+      UART1_Write_Text("hola 1");
+   } else if (lec == 'C'){ /// temperatura relativa
+      IntToStr(temperatura,entero);
+      UART1_Write_Text(entero);
+      UART1_Write_Text("hola 2 ");
+   }else if (lec == 'D'){   /// humedad relativa
+       IntToStr(humedad,entero);
+      UART1_Write_Text(entero);
+      UART1_Write_Text("hola 3 ");
+   }else if (lec == 'F'){ /// rele 1 luces
+         PIN_RELE1 = ~PIN_RELE1 ;
+   }else if (lec == 'G'){ /// rele 2 agua
+          PIN_RELE2 = ~PIN_RELE2 ;
+   }else if (lec == 'H'){    /// rele 3 humidificador
+         PIN_RELE3 = ~PIN_RELE3 ;
+   }else if (lec == 'E'){   /// error
+       PIN_ERROR = ~PIN_ERROR;
+       PIN_OK = ~PIN_OK;
+   }
+
+ }// end while --------------------
+}// end main ---------------------
+
+
+/////////// UART --- LECTURA --- //////////////////////////////
+char read_uart(){
+ char uart_rd = '0';
+ if(UART1_Data_Ready()) {     // If data is received,
+      uart_rd = UART1_Read();     // read the received data,
+  }
+  return uart_rd;
 }
 
-char max6675_pulso(){
-char lei;
-  max6675_ck=1; //saca uno por el reloj
-  Delay_us(10);
-  lei=max6675_dat;
- max6675_ck=0; //saca cero por el reloj
-  Delay_us(10);
-  return lei;
-}
-
-float max6675_read(){
-unsigned int sensor_dato;
-unsigned int max6675_dato=0;
-signed char cont;
-
-    max6675_cs=0;   // habilita el modulo
-    for (cont=15;cont>=0;cont--){
-      if(max6675_pulso()==1){
-         max6675_dato=max6675_dato | 1<<cont ;
-       }// fin if
-    }//fin for
-    max6675_cs=1;  //apagar modulo
-    sensor_dato=(max6675_dato>>3 ); //desplaz 3 veces
-    return((sensor_dato*0.25));
-}
-
-
-///------------------------------- sensor humedad 2
+///////////////////////////// LEER ADC -- SENSOR HUMEDAD INTERNO --- /////////////////////////////
 void Inicializar_ADC(){
     PORTA  = 0x00; //Limpiar el puerto A.
     TRISA  = 0x01; //RA0 como entrada.
@@ -179,50 +123,87 @@ void Inicializar_ADC(){
 }
 
 unsigned int Leer_ADC(unsigned char canal){
-    if(canal > 13)
+    if(canal > 13){
         return 0;
-
-    ADCON0 &= 0xC5;     //Limpiar la selección de bits.
+    }
+    //ADCON0 &= 0xC5;     //Limpiar la selección de bits.
     ADCON0 |= canal<<2; //Se establecen los bits CHS3, CHS2, CHS1 y CHS0.
     Delay_us(2);      //Tiempo de adquisición.
-    ADCON0 = 1;       //Inicialozar la conersión ADC.
-    while(ADCON0);    //Esperar a que la conversión se complete.
-
+    ADCON0.f1 = 1;       //Inicialozar la conersión ADC.
+    while(ADCON0.f1);    //Esperar a que la conversión se complete.
     return ((ADRESH<<8) + ADRESL); //Retornar resultado.
-}
-
-void iniciar_moden(){
-     ec_fsm.anterior=kFSM_ENVIANDO_AT;
-     ec_fsm.actual=kFSM_ENVIANDO_AT;
-}
-
-
-void ms_error(){
-
-}
-
-
-void moden_coneccion(){
-
-switch(ec_fsm.actual) {
-   case kFSM_INICIO:
-        break;
-   case kFSM_ENVIANDO_AT:
-        UART1_Write_Text(&ec25_comandos_at[kAT]);        //Envia comando AT
-        ec_fsm.anterior = ec_fsm.actual;                //almacena el estado actual
-        ec_fsm.actual = kFSM_ESPERANDO_RESPUESTA;        //avanza a esperar respuesta del modem
-        break;
-   case kFSM_RESULTADO_ERROR:
-        break;
-   case kFSM_RESULTADO_EXITOSO:
-        break;
-   case kFSM_ESPERANDO_RESPUESTA:
-          switch(){
-          }
-        break;
-    default: ;
-    }
-
 
 
 }
+////////////////////////////
+char read_dth11(){            //funcion para realizar la lectura del sensor dht11
+  unsigned char dato[5];
+  unsigned char i=0;
+  unsigned char j=0;
+  char valor[4];
+  unsigned int hum=0;
+  unsigned int temp=0;
+  unsigned int base=10;
+
+  temperatura=-1;
+  humedad=-1;
+
+   while(1){
+    //protocolo
+    PIN_SENSOR_Direction=0;  //rb0 de salida
+    PIN_SENSOR=1;  //rb0 en alto
+    delay_us(20);
+    PIN_SENSOR=0;     //rbo en bajo
+    delay_ms(18);
+    PIN_SENSOR=1;     //rbo en alto
+    delay_us(22);
+    PIN_SENSOR_Direction=1; //rbo como entrada para leer la respuesta del sensor
+    delay_us(10);
+    if(PIN_SENSOR){return -1;}    //comprueba si el sensor envio un estado bajo
+    delay_us(80);
+    if(PIN_SENSOR==0){return -1;}      //comprueba si el sensor envio un estado alto despues de 80ms
+    delay_us(80);
+       //inicia la transmision
+       for(i=0;i<5;i++){
+         for(j=0;j<8;j++){
+              while(PIN_SENSOR==0);   //espera a que la entrada sea distinta de 0
+              delay_us(30);     //espera 30 us
+              if(PIN_SENSOR){    // si el pulso despues de 30us esta en alto es porque es un 1
+                 dato[i]=(dato[i]<<1) | 0x01;   // se le agrega un 1 al bit
+              }
+              if(PIN_SENSOR==0){       // si el pulso despues de 30us esta en bajo es porque es un 0
+                 dato[i]=(dato[i]<<1);}  // se le agrega un 0 corriendo a la izquierda            }
+              while(PIN_SENSOR==1);
+         }//fin for de 8
+       }// fin for de 5
+    PIN_SENSOR_Direction=0;    //rb0 de salida
+    PIN_SENSOR=1;     //rb0  en alto
+    //operacion binaria
+    if((dato[0]+dato[1]+dato[2]+dato[3])==dato[4]){
+         hum=dato[0];
+         temp=dato[2];
+
+      base=10;
+      for(i=0;i<2;i++){
+       valor[i]=(hum/base);
+       hum=hum-(valor[i]*base);
+       base=base/10;
+      }
+      base=10;
+      for(i=2;i<4;i++){
+       valor[i]=(temp/base);
+       temp=temp-(valor[i]*base);
+       base=base/10;
+      }
+
+      temperatura=(valor[2]*10)+valor[3];
+      humedad=(valor[0]*10)+valor[1];
+      return 1;
+
+    }else{return -1;}
+   }
+}//fin read_dht
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
