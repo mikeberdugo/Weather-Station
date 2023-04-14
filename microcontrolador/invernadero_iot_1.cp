@@ -1,159 +1,95 @@
 #line 1 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
-#line 17 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
-struct estado_fsm{char anterior, actual;};
-
-
-
-struct estado_fsm ec_fsm;
-
-
-const char *ec25_comandos_at[] = {
- "AT",
- "ATI",
- "AT+CPIN?",
- "AT+CREG?",
- "AT+CMGF=1",
- "AT+CMGS=\"3152849863\"",
- "Mensaje",
-};
-
-
-const char *ec25_repuestas_at[]={
- "OK",
- "EC25",
- "READY",
- "0,1",
- "OK",
- ">",
- "OK",
-};
-
-enum _ec25_lista_comandos_at {
- kAT = 0,
- kATI,
- kAT_CPIN,
- kAT_CREG,
- kAT_CMGF_1,
- kAT_CMGS,
- kAT_TEXT_MSG_END,
-};
-
-enum _fsm_ec25_state{
- kFSM_INICIO=0,
- kFSM_ENVIANDO_AT,
- kFSM_ENVIANDO_ATI,
- kFSM_ENVIANDO_CPIN,
- kFSM_ENVIANDO_CREG,
- kFSM_ENVIANDO_CMGF,
- kFSM_ENVIANDO_CMGS,
- kFSM_ENVIANDO_MENSAJE_TXT,
- kFSM_ESPERANDO_RESPUESTA,
- kFSM_RESULTADO_ERROR,
- kFSM_RESULTADO_EXITOSO
-};
-
-
-void iniciar_moden();
-void moden_coneccion();
-
-
-void max6675_init();
-float max6675_read();
-
+#line 20 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
+void incio();
 
 void Inicializar_ADC();
 unsigned int Leer_ADC(unsigned char canal);
+char read_dth11();
 
 
-
-void incio();
-void sensor_1_temperatura();
-
-
-void main() {
-incio();
-
-max6675_init();
-
-Inicializar_ADC();
-
-while(1){
+char read_uart();
+int temperatura=0;
+int humedad=0;
 
 
+void main(){
 
- moden_coneccion();
- Delay_ms(10000);
- }
-}
+ char lec = 'A';
+ unsigned int aux = 0;
+ int humedad1 = 0;
+ int temperatura1,humedad2,temperatura2;
+ char entero[7];
+ char flotante[15];
 
+ ANSEL = 0X01;
+ ANSELH = 0X00;
 
+ TRISA = 0X01;
+ PORTA = 0X00;
 
-void incio(){
-ANSEL = ANSELH = 0X00 ;
+ TRISB = 0X00;
+ PORTB = 0X08;
+#line 53 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
+ TRISD = 0X00;
+ PORTD = 0X00;
 
-
-TRISA = 0X00;
-PORTA = 0X00;
-
-
-TRISB = 0X00;
-PORTB = 0X00;
-
-
-TRISC = 0X00;
-PORTC = 0X00;
-
-
-TRISD = 0X00;
-PORTD = 0X00;
-
-
-TRISE = 0X00;
-PORTE = 0X00;
-
+ TRISE = 0X00;
+ PORTE = 0X00;
 
  UART1_Init(9600);
  Delay_ms(100);
 
-iniciar_moden();
-}
-
-void max6675_init(){
-  trisc.b3 =0;
-  trisc.b0 =0;
-  trisc.b4 =1;
-
-  RC0_bit =1;
-  RC3_bit =0;
- Delay_ms(100);
-}
-
-char max6675_pulso(){
-char lei;
-  RC3_bit =1;
- Delay_us(10);
- lei= RC4_bit ;
-  RC3_bit =0;
- Delay_us(10);
- return lei;
-}
-
-float max6675_read(){
-unsigned int sensor_dato;
-unsigned int max6675_dato=0;
-signed char cont;
-
-  RC0_bit =0;
- for (cont=15;cont>=0;cont--){
- if(max6675_pulso()==1){
- max6675_dato=max6675_dato | 1<<cont ;
+while( 1 ){
+#line 69 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
+ if (lec == 'A'){
+  RB6_bit  = ~ RB6_bit ;
+ lec = 'J';
  }
+
+ lec = read_uart();
+
+
+
+
+
+ if (lec == 'B'){
+ humedad1 = ADC_Read(0);
+ IntToStr(humedad1,entero);
+ UART1_Write_Text(entero);
+
+ } else if (lec == 'C'){
+ read_dth11() ;
+ IntToStr(temperatura,entero);
+ UART1_Write_Text(entero);
+
+ }else if (lec == 'D'){
+ read_dth11() ;
+ IntToStr(humedad,entero);
+ UART1_Write_Text(entero);
+
+ }else if (lec == 'F'){
+  RB1_bit  = ~ RB1_bit  ;
+ }else if (lec == 'G'){
+  RB2_bit  = ~ RB2_bit  ;
+ }else if (lec == 'H'){
+  RB3_bit  = ~ RB3_bit  ;
+ }else if (lec == 'E'){
+  RB7_bit  = ~ RB7_bit ;
+  RB6_bit  = ~ RB6_bit ;
  }
-  RC0_bit =1;
- sensor_dato=(max6675_dato>>3 );
- return((sensor_dato*0.25));
+
+ }
 }
 
+
+
+char read_uart(){
+ char uart_rd = '0';
+ if(UART1_Data_Ready()) {
+ uart_rd = UART1_Read();
+ }
+ return uart_rd;
+}
 
 
 void Inicializar_ADC(){
@@ -165,48 +101,83 @@ void Inicializar_ADC(){
 }
 
 unsigned int Leer_ADC(unsigned char canal){
- if(canal > 13)
+ if(canal > 13){
  return 0;
-
- ADCON0 &= 0xC5;
- ADCON0 |= canal<<2;
- Delay_us(2);
- ADCON0 = 1;
- while(ADCON0);
-
- return ((ADRESH<<8) + ADRESL);
-}
-
-void iniciar_moden(){
- ec_fsm.anterior=kFSM_ENVIANDO_AT;
- ec_fsm.actual=kFSM_ENVIANDO_AT;
-}
-
-
-void ms_error(){
-
-}
-
-
-void moden_coneccion(){
-
-switch(ec_fsm.actual) {
- case kFSM_INICIO:
- break;
- case kFSM_ENVIANDO_AT:
- UART1_Write_Text(&ec25_comandos_at[kAT]);
- ec_fsm.anterior = ec_fsm.actual;
- ec_fsm.actual = kFSM_ESPERANDO_RESPUESTA;
- break;
- case kFSM_RESULTADO_ERROR:
- break;
- case kFSM_RESULTADO_EXITOSO:
- break;
- case kFSM_ESPERANDO_RESPUESTA:
-
- default: ;
  }
 
+ ADCON0 |= canal<<2;
+ Delay_us(2);
+ ADCON0.f1 = 1;
+ while(ADCON0.f1);
+ return ((ADRESH<<8) + ADRESL);
 
 
+}
+
+char read_dth11(){
+ unsigned char dato[5];
+ unsigned char i=0;
+ unsigned char j=0;
+ char valor[4];
+ unsigned int hum=0;
+ unsigned int temp=0;
+ unsigned int base=10;
+
+ temperatura=-1;
+ humedad=-1;
+
+ while(1){
+
+  trisb.b0 =0;
+  RB0_bit =1;
+ delay_us(20);
+  RB0_bit =0;
+ delay_ms(18);
+  RB0_bit =1;
+ delay_us(22);
+  trisb.b0 =1;
+ delay_us(10);
+ if( RB0_bit ){return -1;}
+ delay_us(80);
+ if( RB0_bit ==0){return -1;}
+ delay_us(80);
+
+ for(i=0;i<5;i++){
+ for(j=0;j<8;j++){
+ while( RB0_bit ==0);
+ delay_us(30);
+ if( RB0_bit ){
+ dato[i]=(dato[i]<<1) | 0x01;
+ }
+ if( RB0_bit ==0){
+ dato[i]=(dato[i]<<1);}
+ while( RB0_bit ==1);
+ }
+ }
+  trisb.b0 =0;
+  RB0_bit =1;
+
+ if((dato[0]+dato[1]+dato[2]+dato[3])==dato[4]){
+ hum=dato[0];
+ temp=dato[2];
+
+ base=10;
+ for(i=0;i<2;i++){
+ valor[i]=(hum/base);
+ hum=hum-(valor[i]*base);
+ base=base/10;
+ }
+ base=10;
+ for(i=2;i<4;i++){
+ valor[i]=(temp/base);
+ temp=temp-(valor[i]*base);
+ base=base/10;
+ }
+
+ temperatura=(valor[2]*10)+valor[3];
+ humedad=(valor[0]*10)+valor[1];
+ return 1;
+
+ }else{return -1;}
+ }
 }

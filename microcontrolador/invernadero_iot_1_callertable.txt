@@ -1,11 +1,18 @@
 main
 	__CC2DW
 		____DoICP
-	incio
-		UART1_Init
-		iniciar_moden
-	max6675_init
-	Inicializar_ADC
-	moden_coneccion
-		UART1_Write_Text
-			UART1_Write
+	UART1_Init
+	read_uart
+		UART1_Data_Ready
+		UART1_Read
+	ADC_Read
+		Delay_22us
+	IntToStr
+		WordToStr
+			Div_16X16_U
+	UART1_Write_Text
+		UART1_Write
+	read_dth11
+		Div_16X16_U
+		Mul_16X16_U
+		Mul_8X8_U

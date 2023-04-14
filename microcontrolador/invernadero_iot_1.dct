@@ -180,7 +180,6 @@ acken_bit
 ackstat
 ackstat_bit
 acos
-actual
 adc_get_sample
 adc_get_sample_ptr
 adc_init
@@ -235,7 +234,6 @@ ans9
 ans9_bit
 ansel
 anselh
-anterior
 asin
 atan
 atan2
@@ -482,9 +480,6 @@ double2int
 double2longint
 double2longword
 double2word
-ec_fsm
-ec25_comandos_at
-ec25_repuestas_at
 eccpas
 eccpas0
 eccpas0_bit
@@ -613,6 +608,7 @@ hextoshort
 hextoword
 hts
 hts_bit
+humedad
 i2c_is_idle
 i2c_is_idle_ptr
 i2c_read
@@ -637,10 +633,8 @@ i2c1_timeout_ptr
 i2c1_wr
 ics_auto
 ics_off
-incio
 indf
 inicializar_adc
-iniciar_moden
 int2double
 intcon
 inte
@@ -725,9 +719,6 @@ manchester_0
 manchester_1
 manchester_out
 max
-max6675_init
-max6675_pulso
-max6675_read
 mc1out
 mc1out_bit
 mc2out
@@ -745,9 +736,7 @@ mm_largestfreememblock
 mm_nrfreeblocksused
 mm_possiblyfragmented
 mm_totalfreememsize
-moden_coneccion
 modf
-ms_error
 msk
 msk0
 msk0_bit
@@ -1007,6 +996,8 @@ re2
 re2_bit
 re3
 re3_bit
+read_dth11
+read_uart
 read_write
 read_write_bit
 res032
@@ -1457,6 +1448,7 @@ t6963c_writecommand
 t6963c_writedata
 tan
 tanh
+temperatura
 time_datetoepoch
 time_epochtodate
 time_jd1970

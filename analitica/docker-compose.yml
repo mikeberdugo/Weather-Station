@@ -1,0 +1,9 @@
+version: "3.2"
+services:
+  analitica:
+    container_name: analitica_1
+    image: analitica_image
+    restart: always
+    build:
+      context: .
+      dockerfile: humedad_1/Dockerfile
