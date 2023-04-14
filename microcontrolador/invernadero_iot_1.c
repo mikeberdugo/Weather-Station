@@ -58,6 +58,9 @@ void main(){
   /// serial
   UART1_Init(9600);               // Initialize UART module at 9600 bps
   Delay_ms(100);
+  PIN_RELE1 = ~PIN_RELE1 ;
+  PIN_RELE2 = ~PIN_RELE2 ;
+  PIN_RELE3 = ~PIN_RELE3 ;
 
 while(true){
  /*UART1_Write_Text("hola 1");

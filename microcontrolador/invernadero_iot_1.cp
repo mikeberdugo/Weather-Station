@@ -38,9 +38,12 @@ void main(){
 
  UART1_Init(9600);
  Delay_ms(100);
+  RB1_bit  = ~ RB1_bit  ;
+  RB2_bit  = ~ RB2_bit  ;
+  RB3_bit  = ~ RB3_bit  ;
 
 while( 1 ){
-#line 69 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
+#line 72 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
  if (lec == 'A'){
   RB6_bit  = ~ RB6_bit ;
  lec = 'J';
