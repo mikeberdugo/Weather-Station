@@ -33,14 +33,15 @@ void main(){
  /// VARIABLES
  char lec = 'A';
  unsigned int aux = 0;
- int humedad1 ;
+ int humedad1 = 0;
  int temperatura1,humedad2,temperatura2;
  char entero[7];
  char flotante[15];
 
-  ANSEL = ANSELH = 0X00 ;
+  ANSEL = 0X01;
+  ANSELH = 0X00;
   /// PUERTO A
-  TRISA = 0X00;
+  TRISA = 0X01;
   PORTA = 0X00;
   /// PUERTO B
   TRISB = 0X00;
@@ -72,7 +73,7 @@ while(true){
 
    lec = read_uart();
    
-   read_dth11() ;
+
 
    
 
@@ -80,15 +81,17 @@ while(true){
       humedad1 = ADC_Read(0);    /// humedad terrestre
       IntToStr(humedad1,entero);
       UART1_Write_Text(entero);
-      UART1_Write_Text("hola 1");
+      //UART1_Write_Text("hola 1");
    } else if (lec == 'C'){ /// temperatura relativa
+      read_dth11() ;
       IntToStr(temperatura,entero);
       UART1_Write_Text(entero);
-      UART1_Write_Text("hola 2 ");
+      //UART1_Write_Text("hola 2 ");
    }else if (lec == 'D'){   /// humedad relativa
+         read_dth11() ;
        IntToStr(humedad,entero);
       UART1_Write_Text(entero);
-      UART1_Write_Text("hola 3 ");
+      //UART1_Write_Text("hola 3 ");
    }else if (lec == 'F'){ /// rele 1 luces
          PIN_RELE1 = ~PIN_RELE1 ;
    }else if (lec == 'G'){ /// rele 2 agua

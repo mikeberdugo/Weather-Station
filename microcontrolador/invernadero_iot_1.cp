@@ -16,19 +16,20 @@ void main(){
 
  char lec = 'A';
  unsigned int aux = 0;
- int humedad1 ;
+ int humedad1 = 0;
  int temperatura1,humedad2,temperatura2;
  char entero[7];
  char flotante[15];
 
- ANSEL = ANSELH = 0X00 ;
+ ANSEL = 0X01;
+ ANSELH = 0X00;
 
- TRISA = 0X00;
+ TRISA = 0X01;
  PORTA = 0X00;
 
  TRISB = 0X00;
  PORTB = 0X08;
-#line 52 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
+#line 53 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
  TRISD = 0X00;
  PORTD = 0X00;
 
@@ -39,7 +40,7 @@ void main(){
  Delay_ms(100);
 
 while( 1 ){
-#line 68 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
+#line 69 "E:/Desktop/proyecto_iot_diplomado/Weather-Station/microcontrolador/invernadero_iot_1.c"
  if (lec == 'A'){
   RB6_bit  = ~ RB6_bit ;
  lec = 'J';
@@ -47,7 +48,7 @@ while( 1 ){
 
  lec = read_uart();
 
- read_dth11() ;
+
 
 
 
@@ -55,15 +56,17 @@ while( 1 ){
  humedad1 = ADC_Read(0);
  IntToStr(humedad1,entero);
  UART1_Write_Text(entero);
- UART1_Write_Text("hola 1");
+
  } else if (lec == 'C'){
+ read_dth11() ;
  IntToStr(temperatura,entero);
  UART1_Write_Text(entero);
- UART1_Write_Text("hola 2 ");
+
  }else if (lec == 'D'){
+ read_dth11() ;
  IntToStr(humedad,entero);
  UART1_Write_Text(entero);
- UART1_Write_Text("hola 3 ");
+
  }else if (lec == 'F'){
   RB1_bit  = ~ RB1_bit  ;
  }else if (lec == 'G'){
